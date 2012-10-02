@@ -1,11 +1,5 @@
 from django import forms
-import re
-alphanum_pattern = re.compile('[\W_]+')
-
-
-def reduce_to_alphanumeric(some_str):
-    return alphanum_pattern.sub('',some_str)
-                                
+from utils import reduce_to_alphanumeric                                
 
 
 field_type_choices = (
@@ -59,3 +53,6 @@ class FieldAsADjangoForm(forms.Form):
                     raise forms.ValidationError(" if the field_type is select_one or select_multiple then value_options shouldnt be empty, error for field with label %s" % self.field.get("label"))
                     
             return cleaned_data
+
+class DisplayForm(forms.Form):
+        pass
