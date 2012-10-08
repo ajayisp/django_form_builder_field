@@ -49,7 +49,6 @@ class FormFieldTestCase(TestCase):
         self.assertTrue(possible_initial_fields[0]['name'] in self.model_instance.form.all_fields)
 
 
-
     def test_add_field(self):
         """
         Add a new field to the form and check the behaviour
@@ -57,8 +56,9 @@ class FormFieldTestCase(TestCase):
         new_field = {'label': 'github', 'name':'candidate_github', 'field_type':'url', 'field_description':'', 'is_required':True, 'choices':None, 'is_compulsory': False}
         self.assertTrue(self.model_instance.form.add_field(new_field))
 
-        # should raise ValueError if a same field is added again
-        self.assertRaises(ValueError, self.model_instance.form.add_field, new_field)
+        # should raise ValueError if a same field(actually another field with same name ) is added again
+        duplicate_field ={'label': 'github_new', 'name':'candidate_github', 'field_type':'number', 'field_description':'', 'is_required':True, 'choices':None, 'is_compulsory': False}
+        self.assertRaises(ValueError, self.model_instance.form.add_field, duplicate_field)
 
         field_dict = { 'field_details': new_field, 'meta':{'is_choosen':True, 'is_compulsory':new_field['is_compulsory'], 'is_predefined':False, 'is_userdefined':True} }
         
@@ -67,6 +67,7 @@ class FormFieldTestCase(TestCase):
 
         #field should be in the selected fields
         self.assertTrue(new_field in self.model_instance.form.selected_fields)
+        
 
     def test_remove_field(self):
         """
@@ -89,26 +90,6 @@ class FormFieldTestCase(TestCase):
         self.model_instance.form.add_field(compulsory_field)        
         self.assertRaises(ValueError, self.model_instance.form.remove_field, compulsory_field['name'])
 
-
-    # def test_set_fields(self):
-    #     """
-    #     Test the setting of the forms fields to new values
-    #     """
-        
-    #     new_fields = [{'label': 'age', 'name':'candidate_age', 'field_type':'small_text', 'field_description':'', 'is_required':True, 'choices':None, 'is_compulsory':True},
-    #     {'label': 'height', 'name':'candidate_height', 'field_type':'email', 'field_description':'', 'is_required':True, 'is_compulsory':True , 'choices':None},
-    #     {'label': 'weight', 'name':'candidate_weight', 'field_type':'small_text', 'field_description':'', 'is_required':True, 'choices':None, 'is_compulsory':True},
-    #     {'label': 'facebook', 'name':'candidate_facebook', 'field_type':'url', 'field_description':'', 'is_required':True, 'choices':None, 'is_compulsory':False}
-    #     ]
-    #     #set the new fields
-    #     self.model_instance.form.set_fields(new_fields)
-        
-    #     # hit save to reflect in database
-    #     self.model_instance.save()
-        
-    #     print self.model_instance.form.fields
-    #     self.assertEqual(self.model_instance.form.all_fields.raw_fields, new_fields)
-
     def test_edit_field(self):
         """
         Tests the edit_field function on formfield 
@@ -129,8 +110,8 @@ class FormFieldTestCase(TestCase):
         #check for the existence of the modified field in fields list
         self.assertTrue(modified_field in self.model_instance.form.all_fields.raw_fields)
 
-        #should raise ValueError if the name of field to edit is not found
-        with self.assertRaises(ValueError):
+        #should raise IndexError if the name of field to edit is not found
+        with self.assertRaises(IndexError):
             self.model_instance.form.edit_field("somethingsomething", modified_field)
 
         # create a compulsory field
@@ -142,6 +123,4 @@ class FormFieldTestCase(TestCase):
         modified_compulsory_field["field_description"] = "this is the modified compulsory field"
         
         with self.assertRaises(ValueError):
-            self.model_instance.form.edit_field(modified_compulsory_field['name'], modified_compulsory_field)        
-        
-
+            self.model_instance.form.edit_field(modified_compulsory_field['name'], modified_compulsory_field)

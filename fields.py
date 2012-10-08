@@ -1,8 +1,6 @@
 from jsonfield import JSONField, JSON_DECODE_ERROR
 from django.utils import simplejson as json
 from utils import reduce_to_alphanumeric
-from validation import create_django_form_field
-from forms import DisplayForm
 
 
 class FormFieldsDataStructure(list):
@@ -10,7 +8,11 @@ class FormFieldsDataStructure(list):
     @property
     def raw_fields(self):
         raw_fields_list = []
-        for field in self:
+        from copy import deepcopy
+        
+        # copy the contents of own list to another one , cause own list may change unexpectedly
+        copy_list = deepcopy(self)
+        for field in copy_list:
             raw_fields_list.append(field['field_details'])
         return raw_fields_list
 
@@ -80,6 +82,7 @@ class Fields(object):
         Returns True if the field is successfully added or throws
         ValueError instead (if validation or something fails)
         """
+        # lots of stuff left, needs to be done here
         if not field.get('name'):
             field['name'] = reduce_to_alphanumeric(unicode(field.get('label')).lower())
             
@@ -89,6 +92,10 @@ class Fields(object):
         return True
 
     def edit_field(self, name, new_field_details):
+        """
+        Edits a field whose name is given
+        Takes name and new field details as parameters
+        """
         field_to_edit = None
         for field  in self.fields:
             if field['name'] == name:
@@ -96,7 +103,7 @@ class Fields(object):
                 break
 
         if not field_to_edit:
-            raise ValueError("Field with name %s not found " % name)
+            raise IndexError("Field with name %s not found " % name)
 
         if field_to_edit.get('is_compulsory', False):
             for key in field_to_edit.keys():

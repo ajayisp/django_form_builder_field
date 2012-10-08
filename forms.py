@@ -53,6 +53,4 @@ class FieldAsADjangoForm(forms.Form):
                     raise forms.ValidationError(" if the field_type is select_one or select_multiple then value_options shouldnt be empty, error for field with label %s" % self.field.get("label"))
                     
             return cleaned_data
-
-class DisplayForm(forms.Form):
-        pass
+            
